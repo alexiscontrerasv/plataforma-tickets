@@ -16,6 +16,18 @@
     <div id="tickets-container" class="w-full max-w-2xl space-y-4">
         <ul id="tickets-list"></ul>
     </div>
+    <section class="mt-10 w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-4 text-center"> Crear nuevo Ticket</h2>
+        <form id="form-ticket" class="space-y-4">
+            <input type="text" id="titulo" name="titulo" placeholder="Titulo del ticket"
+                class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-300"
+                required>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                Crear Ticket
+            </button>
+        </form>
+        <p id="mensaje" class="mt-4 text-center text-sm"></p>
+    </section>
 
 
     <script>
@@ -25,7 +37,8 @@
                 const tickets = await response.json();
 
                 const container = document.getElementById('tickets-container');
-
+                container.innerHTML = '';
+                
                 tickets.forEach(ticket => {
                     const card = document.createElement('div');
 
@@ -51,9 +64,48 @@
                 console.error('Error al cargar los tickets:', error);
             }
         }
-
-
         cargarTickets();
+
+        // Nueva función para manejar la creación de tickets
+        const form = document.getElementById('form-ticket');
+        const mensaje = document.getElementById('mensaje');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evitar que recargue la página
+
+            const titulo = document.getElementById('titulo').value.trim();
+
+            if (titulo.length < 5) {
+                mensaje.textContent = 'El título debe tener al menos 5 caracteres.';
+                mensaje.className = 'text-red-500';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/tickets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ titulo })
+                });
+
+                if (response.ok) {
+                    const nuevoTicket = await response.json();
+                    mensaje.textContent = 'Ticket creado exitosamente.';
+                    mensaje.className = 'text-green-500';
+                    form.reset();
+                    cargarTickets(); // Recargar la lista de tickets
+                } else {
+                    const error = await response.json();
+                    mensaje.textContent = error.mensaje || 'Error al crear ticket.';
+                    mensaje.className = 'text-red-500';
+                }
+            } catch (error) {
+                mensaje.textContent = 'Error de conexión con el servidor.';
+                mensaje.className = 'text-red-500';
+            }
+        });
     </script>
 </body>
 
