@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/css/styles.css" rel="stylesheet">
+    <title>Plataforma de Tickets</title>
+
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+    <h1 class="text-3xl font-bold text-center mb-6">Lista de Tickets</h1>
+
+    <div id="tickets-container" class="w-full max-w-2xl space-y-4">
+        <ul id="tickets-list"></ul>
+    </div>
+
+
+    <script>
+        async function cargarTickets() {
+            try {
+                const response = await fetch('http://localhost:3000/tickets');
+                const tickets = await response.json();
+
+                const container = document.getElementById('tickets-container');
+
+                tickets.forEach(ticket => {
+                    const card = document.createElement('div');
+
+                    // Definimos color de fondo según el estado
+                    let estadoColor = '';
+                    if (ticket.estado === 'abierto') {
+                        estadoColor = 'bg-green-100';
+                    } else if (ticket.estado === 'en progreso') {
+                        estadoColor = 'bg-yellow-100';
+                    } else if (ticket.estado === 'cerrado') {
+                        estadoColor = 'bg-red-100';
+                    }
+
+                    card.className = `ticket-card ${estadoColor} rounded-lg shadow-md p-4 hover:scale-105 transition-transform`;
+
+                    card.innerHTML = `
+        <h2 class="text-xl font-semibold mb-2">#${ticket.id} - ${ticket.titulo}</h2>
+        <p class="text-gray-700 font-medium">Estado: ${ticket.estado}</p>
+      `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error al cargar los tickets:', error);
+            }
+        }
+
+
+        cargarTickets();
+    </script>
+</body>
+
+</html>
