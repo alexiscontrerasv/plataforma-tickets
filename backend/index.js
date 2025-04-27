@@ -1,8 +1,16 @@
+const path = require('path');
 const express = require('express');
+const cors = require('cors');
+
 const app = express();
 const PORT = 3000;
 
+app.use(cors());
+
 // Importamos las rutas
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 const ticketsRoutes = require('./routes/tickets.routes');
 
 // Ruta base
