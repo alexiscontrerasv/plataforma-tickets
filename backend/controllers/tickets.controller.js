@@ -20,17 +20,31 @@ const obtenerTicketPorId = (req, res) => {
 const crearTicket = (req, res) => {
   const { titulo } = req.body;
 
+  // Validar que el título exista
   if (!titulo) {
-    return res.status(400).json({ mensaje: 'El titulo es obligatorio' });
+    return res.status(400).json({ mensaje: 'El título es obligatorio' });
   }
 
+  // Validar que no esté vacío o solo espacios
+  const tituloLimpio = titulo.trim();
+  if (tituloLimpio.length === 0) {
+    return res.status(400).json({ mensaje: 'El título no puede estar vacío o solo con espacios' });
+  }
+
+  // Validar que tenga mínimo 5 caracteres reales
+  if (tituloLimpio.length < 5) {
+    return res.status(400).json({ mensaje: 'El título debe tener al menos 5 caracteres' });
+  }
+
+  // Crear nuevo ticket
   const nuevoTicket = {
-    id: tickets.length + 1, //Generamos un id simple
-    titulo,
-    estado: 'abierto' //estado por defecto
+    id: tickets.length + 1,
+    titulo: tituloLimpio, // guardamos el título limpio
+    estado: 'abierto'
   };
 
   tickets.push(nuevoTicket);
+
   res.status(201).json(nuevoTicket);
 };
 
