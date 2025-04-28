@@ -18,35 +18,42 @@ const obtenerTicketPorId = (req, res) => {
 
 // Función para crear un nuevo ticket
 const crearTicket = (req, res) => {
-  const { titulo } = req.body;
+  const { titulo, descripcion, cliente, prioridad } = req.body;
 
-  // Validar que el título exista
-  if (!titulo) {
-    return res.status(400).json({ mensaje: 'El título es obligatorio' });
+  // Validaciones
+  if (!titulo || titulo.trim().length < 5) {
+    return res.status(400).json({ mensaje: 'El título es obligatorio y debe tener al menos 5 caracteres.' });
   }
 
-  // Validar que no esté vacío o solo espacios
-  const tituloLimpio = titulo.trim();
-  if (tituloLimpio.length === 0) {
-    return res.status(400).json({ mensaje: 'El título no puede estar vacío o solo con espacios' });
+  if (!descripcion || descripcion.trim().length < 10) {
+    return res.status(400).json({ mensaje: 'La descripción es obligatoria y debe tener al menos 10 caracteres.' });
   }
 
-  // Validar que tenga mínimo 5 caracteres reales
-  if (tituloLimpio.length < 5) {
-    return res.status(400).json({ mensaje: 'El título debe tener al menos 5 caracteres' });
+  if (!cliente || cliente.trim().length === 0) {
+    return res.status(400).json({ mensaje: 'El nombre del cliente es obligatorio.' });
+  }
+
+  const prioridadesValidas = ['baja', 'media', 'alta'];
+  if (!prioridad || !prioridadesValidas.includes(prioridad.toLowerCase())) {
+    return res.status(400).json({ mensaje: 'La prioridad debe ser baja, media o alta.' });
   }
 
   // Crear nuevo ticket
   const nuevoTicket = {
     id: tickets.length + 1,
-    titulo: tituloLimpio, // guardamos el título limpio
-    estado: 'abierto'
+    titulo: titulo.trim(),
+    descripcion: descripcion.trim(),
+    cliente: cliente.trim(),
+    prioridad: prioridad.toLowerCase(),
+    estado: 'abierto',
+    createdAt: new Date().toISOString() // Guardamos fecha/hora actual en formato ISO
   };
 
   tickets.push(nuevoTicket);
 
   res.status(201).json(nuevoTicket);
 };
+
 
 
 
